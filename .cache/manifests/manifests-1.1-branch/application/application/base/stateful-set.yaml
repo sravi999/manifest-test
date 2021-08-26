@@ -1,29 +1,34 @@
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: stateful-set
 spec:
-  serviceName: service
   selector:
     matchLabels:
       app: application-controller
+  serviceName: service
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         app: application-controller
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - name: manager
-        command:
+      - command:
         - /root/manager
-        image: gcr.io/kubeflow-images-public/kubernetes-sigs/application
-        imagePullPolicy: Always
         env:
-        # TODO(https://github.com/kubeflow/manifests/issues/1043)
-        # Do we really need this?
         - name: project
           value: $(project)
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/kubernetes-sigs/application:1.0-beta
+        imagePullPolicy: Always
+        name: manager
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: service-account
   volumeClaimTemplates: []

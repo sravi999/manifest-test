@@ -1,4 +1,9 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/cache-server
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/cache-server
+  newTag: 1.0.0
 kind: Kustomization
 resources:
 - cache-deployment.yaml
@@ -6,6 +11,3 @@ resources:
 - cache-role.yaml
 - cache-rolebinding.yaml
 - cache-sa.yaml
-images:
-- name: gcr.io/ml-pipeline/cache-server
-  newTag: 1.0.0

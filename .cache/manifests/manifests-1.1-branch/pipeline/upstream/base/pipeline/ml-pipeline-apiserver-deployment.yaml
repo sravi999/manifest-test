@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,77 +21,83 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: OBJECTSTORECONFIG_SECURE
-          value: "false"
+          value: 'false'
         - name: OBJECTSTORECONFIG_BUCKETNAME
           valueFrom:
             configMapKeyRef:
-              name: pipeline-install-config
               key: bucketName
+              name: pipeline-install-config
         - name: DBCONFIG_USER
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
               key: username
+              name: mysql-secret
         - name: DBCONFIG_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
               key: password
+              name: mysql-secret
         - name: DBCONFIG_DBNAME
           valueFrom:
             configMapKeyRef:
-              name: pipeline-install-config
               key: pipelineDb
+              name: pipeline-install-config
         - name: DBCONFIG_HOST
           valueFrom:
             configMapKeyRef:
-              name: pipeline-install-config
               key: dbHost
+              name: pipeline-install-config
         - name: DBCONFIG_PORT
           valueFrom:
             configMapKeyRef:
-              name: pipeline-install-config
               key: dbPort
+              name: pipeline-install-config
         - name: OBJECTSTORECONFIG_ACCESSKEY
           valueFrom:
             secretKeyRef:
-              name: mlpipeline-minio-artifact
               key: accesskey
+              name: mlpipeline-minio-artifact
         - name: OBJECTSTORECONFIG_SECRETACCESSKEY
           valueFrom:
             secretKeyRef:
-              name: mlpipeline-minio-artifact
               key: secretkey
-        image: gcr.io/ml-pipeline/api-server:dummy
+              name: mlpipeline-minio-artifact
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/api-server:1.0.0
         imagePullPolicy: IfNotPresent
-        name: ml-pipeline-api-server
-        ports:
-        - name: http
-          containerPort: 8888
-        - name: grpc
-          containerPort: 8887
-        readinessProbe:
-          exec:
-            command:
-              - wget
-              - -q # quiet
-              - -S # show server response
-              - -O
-              - "-" # Redirect output to stdout
-              - http://localhost:8888/apis/v1beta1/healthz
-          initialDelaySeconds: 3
-          periodSeconds: 5
-          timeoutSeconds: 2
         livenessProbe:
           exec:
             command:
-              - wget
-              - -q # quiet
-              - -S # show server response
-              - -O
-              - "-" # Redirect output to stdout
-              - http://localhost:8888/apis/v1beta1/healthz
+            - wget
+            - -q
+            - -S
+            - -O
+            - '-'
+            - http://localhost:8888/apis/v1beta1/healthz
           initialDelaySeconds: 3
           periodSeconds: 5
           timeoutSeconds: 2
+        name: ml-pipeline-api-server
+        ports:
+        - containerPort: 8888
+          name: http
+        - containerPort: 8887
+          name: grpc
+        readinessProbe:
+          exec:
+            command:
+            - wget
+            - -q
+            - -S
+            - -O
+            - '-'
+            - http://localhost:8888/apis/v1beta1/healthz
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 2
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: ml-pipeline

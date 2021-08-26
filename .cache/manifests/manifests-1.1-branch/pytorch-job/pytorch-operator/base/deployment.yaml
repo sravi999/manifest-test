@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -9,10 +10,10 @@ spec:
       name: pytorch-operator
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         name: pytorch-operator
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - command:
@@ -29,6 +30,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: gcr.io/kubeflow-images-public/pytorch-operator:v0.6.0-18-g5e36a57
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/pytorch-operator:vmaster-gd596e904
         name: pytorch-operator
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: pytorch-operator

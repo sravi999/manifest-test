@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,13 +7,12 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: 'false'
     spec:
       containers:
-      - name: manager
-        image: gcr.io/kubeflow-images-public/notebook-controller:v20190614-v0-160-g386f2749-e3b0c4
-        command:
-          - /manager
+      - command:
+        - /manager
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/notebook-controller:vmaster-gf39279c0
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -20,4 +20,11 @@ spec:
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 30
+        name: manager
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: service-account

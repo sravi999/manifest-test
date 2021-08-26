@@ -1,26 +1,32 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ui
   labels:
     app: metadata-ui
+  name: ui
 spec:
   selector:
     matchLabels:
       app: metadata-ui
   template:
     metadata:
-      name: ui
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         app: metadata-ui
-      annotations:
-        sidecar.istio.io/inject: "false"
+      name: ui
     spec:
       containers:
-      - image: gcr.io/kubeflow-images-public/metadata-frontend:v0.1.8
+      - image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/metadata-frontend:v0.1.8
         imagePullPolicy: IfNotPresent
         name: metadata-ui
         ports:
         - containerPort: 3000
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: ui
-

@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment
   labels:
     component: server
+  name: deployment
 spec:
   replicas: 1
   selector:
@@ -11,48 +12,53 @@ spec:
       component: server
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         component: server
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - name: container
-        image: gcr.io/kubeflow-images-public/metadata:v0.1.11
-        command: ["./server/server",
-                  "--http_port=8080"]
-        ports:
-        - name: backendapi
-          containerPort: 8080
-
-        readinessProbe:
-          httpGet:
-            path: /api/v1alpha1/artifact_types
-            port: backendapi
-            httpHeaders:
-            - name: ContentType
-              value: application/json
-          initialDelaySeconds: 3
-          periodSeconds: 5
-          timeoutSeconds: 2
-
+      - command:
+        - ./server/server
+        - --http_port=8080
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/metadata:v0.1.11
         livenessProbe:
           httpGet:
-            path: /api/v1alpha1/artifact_types
-            port: backendapi
             httpHeaders:
             - name: ContentType
               value: application/json
+            path: /api/v1alpha1/artifact_types
+            port: backendapi
           initialDelaySeconds: 3
           periodSeconds: 5
           timeoutSeconds: 2
+        name: container
+        ports:
+        - containerPort: 8080
+          name: backendapi
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: ContentType
+              value: application/json
+            path: /api/v1alpha1/artifact_types
+            port: backendapi
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 2
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grpc-deployment
   labels:
     component: grpc-server
+  name: grpc-deployment
 spec:
   replicas: 1
   selector:
@@ -60,19 +66,27 @@ spec:
       component: grpc-server
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         component: grpc-server
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
-        - name: container
-          envFrom:
-          - configMapRef:
-              name: grpc-configmap
-          image: gcr.io/tfx-oss-public/ml_metadata_store_server:v0.21.1
-          command: ["/bin/metadata_store_server"]
-          args: ["--grpc_port=$(METADATA_GRPC_SERVICE_PORT)"]
-          ports:
-            - name: grpc-backendapi
-              containerPort: 8080 #The value of the port number needs to be in sync with value  specified in grpc-params.env
+      - args:
+        - --grpc_port=$(METADATA_GRPC_SERVICE_PORT)
+        command:
+        - /bin/metadata_store_server
+        envFrom:
+        - configMapRef:
+            name: grpc-configmap
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/tfx-oss-public/ml_metadata_store_server:v0.21.1
+        name: container
+        ports:
+        - containerPort: 8080
+          name: grpc-backendapi
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi

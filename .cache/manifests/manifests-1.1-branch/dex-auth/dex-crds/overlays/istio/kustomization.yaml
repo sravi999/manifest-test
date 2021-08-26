@@ -1,24 +1,24 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
 bases:
 - ../../base
-resources:
-- virtual-service.yaml
-
 configMapGenerator:
-- name: dex-parameters
-  behavior: merge
+- behavior: merge
   envs:
   - params.env
-generatorOptions:
-  disableNameSuffixHash: true
-vars:
-- name: namespace
-  objref:
-    kind: ConfigMap
-    name: dex-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.namespace
+  name: dex-parameters
 configurations:
 - params.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+kind: Kustomization
+resources:
+- virtual-service.yaml
+vars:
+- fieldref:
+    fieldpath: data.namespace
+  name: namespace
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: dex-parameters

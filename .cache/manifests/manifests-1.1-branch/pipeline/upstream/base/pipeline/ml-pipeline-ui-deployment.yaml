@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,61 +14,67 @@ spec:
       labels:
         app: ml-pipeline-ui
     spec:
-      volumes:
-      - name: config-volume
-        configMap:
-          name: ml-pipeline-ui-configmap
       containers:
-      - image: gcr.io/ml-pipeline/frontend:dummy
+      - env:
+        - name: VIEWER_TENSORBOARD_POD_TEMPLATE_SPEC_PATH
+          value: /etc/config/viewer-pod-template.json
+        - name: MINIO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: accesskey
+              name: mlpipeline-minio-artifact
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: secretkey
+              name: mlpipeline-minio-artifact
+        - name: ALLOW_CUSTOM_VISUALIZATIONS
+          value: 'true'
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/frontend:1.0.0
         imagePullPolicy: IfNotPresent
-        name: ml-pipeline-ui
-        ports:
-        - containerPort: 3000
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/config
-          readOnly: true
-        env:
-          - name: VIEWER_TENSORBOARD_POD_TEMPLATE_SPEC_PATH
-            value: /etc/config/viewer-pod-template.json
-          - name: MINIO_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: MINIO_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: mlpipeline-minio-artifact
-                key: accesskey
-          - name: MINIO_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: mlpipeline-minio-artifact
-                key: secretkey
-          - name: ALLOW_CUSTOM_VISUALIZATIONS
-            value: "true"
-        readinessProbe:
-          exec:
-            command:
-              - wget
-              - -q # quiet
-              - -S # show server response
-              - -O
-              - "-" # Redirect output to stdout
-              - http://localhost:3000/apis/v1beta1/healthz
-          initialDelaySeconds: 3
-          periodSeconds: 5
-          timeoutSeconds: 2
         livenessProbe:
           exec:
             command:
-              - wget
-              - -q # quiet
-              - -S # show server response
-              - -O
-              - "-" # Redirect output to stdout
-              - http://localhost:3000/apis/v1beta1/healthz
+            - wget
+            - -q
+            - -S
+            - -O
+            - '-'
+            - http://localhost:3000/apis/v1beta1/healthz
           initialDelaySeconds: 3
           periodSeconds: 5
           timeoutSeconds: 2
+        name: ml-pipeline-ui
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          exec:
+            command:
+            - wget
+            - -q
+            - -S
+            - -O
+            - '-'
+            - http://localhost:3000/apis/v1beta1/healthz
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 2
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
+        volumeMounts:
+        - mountPath: /etc/config
+          name: config-volume
+          readOnly: true
       serviceAccountName: ml-pipeline-ui
+      volumes:
+      - configMap:
+          name: ml-pipeline-ui-configmap
+        name: config-volume

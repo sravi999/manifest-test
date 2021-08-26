@@ -1,40 +1,34 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: kubeflow
-resources:
-  # Control pane
-  - ../../admission-webhook/webhook/v3
-  - ../../common/centraldashboard/overlays/stacks
-  - ../../kubeflow-roles/base
-  - ../../jupyter/jupyter-web-app/base_v3
-  - ../../jupyter/notebook-controller/base_v3
-  - ../../profiles/base_v3
-  # Training Operators
-  - ../../pytorch-job/pytorch-job-crds/overlays/application
-  - ../../pytorch-job/pytorch-operator/overlays/application
-  - ../../tf-training/tf-job-crds/overlays/application
-  - ../../tf-training/tf-job-operator/overlays/application
-  - ../../mxnet-job/mxnet-operator/overlays/application
-  - ../../mpi-job/mpi-operator/overlays/application
-  - ../../katib/installs/katib-standalone
-  # Pipelines
-  - ../../pipeline/minio/installs/generic
-  - ../../pipeline/mysql/installs/generic
-  - ../../pipeline/installs/multi-user
-  - ../../argo/base_v3
-  # Serving components
-  - ../../seldon/seldon-core-operator/overlays/application
-  # Metadata
-  - ../../metadata/v3
-generatorOptions:
-  disableNameSuffixHash: true
 configMapGenerator:
 - envs:
   - ./config/params.env
   name: kubeflow-config
+generatorOptions:
+  disableNameSuffixHash: true
+kind: Kustomization
+namespace: kubeflow
+resources:
+- ../../admission-webhook/webhook/v3
+- ../../common/centraldashboard/overlays/stacks
+- ../../kubeflow-roles/base
+- ../../jupyter/jupyter-web-app/base_v3
+- ../../jupyter/notebook-controller/base_v3
+- ../../profiles/base_v3
+- ../../pytorch-job/pytorch-job-crds/overlays/application
+- ../../pytorch-job/pytorch-operator/overlays/application
+- ../../tf-training/tf-job-crds/overlays/application
+- ../../tf-training/tf-job-operator/overlays/application
+- ../../mxnet-job/mxnet-operator/overlays/application
+- ../../mpi-job/mpi-operator/overlays/application
+- ../../katib/installs/katib-standalone
+- ../../pipeline/minio/installs/generic
+- ../../pipeline/mysql/installs/generic
+- ../../pipeline/installs/multi-user
+- ../../argo/base_v3
+- ../../seldon/seldon-core-operator/overlays/application
+- ../../metadata/v3
 vars:
-# We need to define vars at the top level otherwise we will get
-# conflicts.
 - fieldref:
     fieldPath: data.clusterDomain
   name: clusterDomain
@@ -53,6 +47,6 @@ vars:
     fieldpath: metadata.namespace
   name: katib-ui-namespace
   objref:
+    apiVersion: v1
     kind: Service
     name: katib-ui
-    apiVersion: v1

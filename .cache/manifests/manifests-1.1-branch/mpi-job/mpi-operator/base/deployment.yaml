@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -9,10 +10,10 @@ spec:
       app: mpi-operator
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         app: mpi-operator
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - args:
@@ -21,7 +22,13 @@ spec:
         - $(lock-namespace)
         - --kubectl-delivery-image
         - $(kubectl-delivery-image)
-        image: mpioperator/mpi-operator:latest
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/mpi-operator:latest
         imagePullPolicy: Always
         name: mpi-operator
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: mpi-operator

@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -9,13 +10,13 @@ spec:
   selector:
     matchLabels:
       app: metacontroller
-  serviceName: ""
+  serviceName: ''
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         app: metacontroller
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - command:
@@ -23,21 +24,19 @@ spec:
         - --logtostderr
         - -v=4
         - --discovery-interval=20s
-        image: metacontroller/metacontroller:v0.3.0
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/metacontroller:v0.3.0
         imagePullPolicy: Always
         name: metacontroller
         ports:
         - containerPort: 2345
         resources:
           limits:
-            cpu: "4"
-            memory: 4Gi
+            memory: 300Mi
           requests:
-            cpu: 500m
-            memory: 1Gi
+            cpu: 50m
+            memory: 300Mi
         securityContext:
           allowPrivilegeEscalation: true
           privileged: true
       serviceAccountName: meta-controller-service
-  # Workaround for https://github.com/kubernetes-sigs/kustomize/issues/677
   volumeClaimTemplates: []

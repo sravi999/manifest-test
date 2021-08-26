@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 commonLabels:
   app: notebook-controller
@@ -10,8 +11,8 @@ configMapGenerator:
   - ISTIO_GATEWAY=kubeflow/kubeflow-gateway
   name: notebook-controller-config
 images:
-- name: gcr.io/kubeflow-images-public/notebook-controller
-  newName: gcr.io/kubeflow-images-public/notebook-controller
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/notebook-controller
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/notebook-controller
   newTag: vmaster-gf39279c0
 kind: Kustomization
 namePrefix: notebook-controller-

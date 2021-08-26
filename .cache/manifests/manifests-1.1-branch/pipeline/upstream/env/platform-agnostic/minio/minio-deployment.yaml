@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: minio
   labels:
     app: minio
+  name: minio
 spec:
   selector:
     matchLabels:
@@ -23,17 +24,23 @@ spec:
         - name: MINIO_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: mlpipeline-minio-artifact
               key: accesskey
+              name: mlpipeline-minio-artifact
         - name: MINIO_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: mlpipeline-minio-artifact
               key: secretkey
-        image: gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance
+              name: mlpipeline-minio-artifact
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance
         name: minio
         ports:
         - containerPort: 9000
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
         volumeMounts:
         - mountPath: /data
           name: data

@@ -1,4 +1,17 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- envs:
+  - params.env
+  name: dex-parameters
+configurations:
+- params.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/dexidp/dex
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/dexidp/dex
+  newTag: v2.22.0
 kind: Kustomization
 namespace: auth
 resources:
@@ -7,79 +20,67 @@ resources:
 - crds.yaml
 - deployment.yaml
 - service.yaml
-configMapGenerator:
-- name: dex-parameters
-  envs:
-  - params.env
-generatorOptions:
-  disableNameSuffixHash: true
 vars:
-- name: dex_domain
-  objref:
-    kind: ConfigMap
-    name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.dex_domain
-- name: issuer
+  name: dex_domain
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.issuer
-- name: static_email
+  name: issuer
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.static_email
-- name: static_password_hash
+  name: static_email
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.static_password_hash
-- name: static_username
+  name: static_password_hash
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.static_username
-- name: static_user_id
+  name: static_username
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.static_user_id
-- name: client_id
+  name: static_user_id
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.client_id
-- name: oidc_redirect_uris
+  name: client_id
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.oidc_redirect_uris
-- name: application_secret
+  name: oidc_redirect_uris
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: dex-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.application_secret
-configurations:
-- params.yaml
-images:
-- name: quay.io/dexidp/dex
-  newName: quay.io/dexidp/dex
-  newTag: v2.22.0
+  name: application_secret
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: dex-parameters

@@ -1,4 +1,22 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  kustomize.component: argo
+configMapGenerator:
+- envs:
+  - params.env
+  name: workflow-controller-parameters
+configurations:
+- params.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/argoui
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/argoui
+  newTag: v2.3.0
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/workflow-controller
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/workflow-controller
+  newTag: v2.3.0
 kind: Kustomization
 resources:
 - cluster-role-binding.yaml
@@ -8,105 +26,88 @@ resources:
 - deployment.yaml
 - service-account.yaml
 - service.yaml
-commonLabels:
-  kustomize.component: argo
-images:
-- name: argoproj/argoui
-  newName: argoproj/argoui
-  newTag: v2.3.0
-- name: argoproj/workflow-controller
-  newName: argoproj/workflow-controller
-  newTag: v2.3.0
-configMapGenerator:
-- name: workflow-controller-parameters
-  envs:
-  - params.env
-generatorOptions:
-  disableNameSuffixHash: true
 vars:
-- name: executorImage
-  objref:
-    kind: ConfigMap
-    name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.executorImage
-- name: containerRuntimeExecutor
+  name: executorImage
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.containerRuntimeExecutor
-- name: artifactRepositoryBucket
+  name: containerRuntimeExecutor
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositoryBucket
-- name: artifactRepositoryKeyPrefix
+  name: artifactRepositoryBucket
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositoryKeyPrefix
-- name: artifactRepositoryEndpoint
+  name: artifactRepositoryKeyPrefix
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositoryEndpoint
-- name: artifactRepositoryInsecure
+  name: artifactRepositoryEndpoint
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositoryInsecure
-- name: artifactRepositoryAccessKeySecretName
+  name: artifactRepositoryInsecure
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositoryAccessKeySecretName
-- name: artifactRepositoryAccessKeySecretKey
+  name: artifactRepositoryAccessKeySecretName
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositoryAccessKeySecretKey
-- name: artifactRepositorySecretKeySecretName
+  name: artifactRepositoryAccessKeySecretKey
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositorySecretKeySecretName
-- name: artifactRepositorySecretKeySecretKey
+  name: artifactRepositorySecretKeySecretName
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.artifactRepositorySecretKeySecretKey
-- name: namespace
+  name: artifactRepositorySecretKeySecretKey
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.namespace
-- name: clusterDomain
+  name: namespace
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: workflow-controller-parameters
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.clusterDomain
-configurations:
-- params.yaml
+  name: clusterDomain
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: workflow-controller-parameters

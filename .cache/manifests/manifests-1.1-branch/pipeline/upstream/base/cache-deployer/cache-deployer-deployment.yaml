@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cache-deployer-deployment
   labels:
     app: cache-deployer
+  name: cache-deployer-deployment
 spec:
   replicas: 1
   selector:
@@ -17,13 +18,19 @@ spec:
         app: cache-deployer
     spec:
       containers:
-      - name: main
-        image: gcr.io/ml-pipeline/cache-deployer:dummy
-        imagePullPolicy: Always
-        env:
+      - env:
         - name: NAMESPACE_TO_WATCH
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-      serviceAccountName: kubeflow-pipelines-cache-deployer-sa
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/cache-deployer:1.0.0
+        imagePullPolicy: Always
+        name: main
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       restartPolicy: Always
+      serviceAccountName: kubeflow-pipelines-cache-deployer-sa
