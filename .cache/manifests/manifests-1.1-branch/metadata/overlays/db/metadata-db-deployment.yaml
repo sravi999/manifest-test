@@ -1,26 +1,25 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: metadata-db
   labels:
     component: db
+  name: metadata-db
 spec:
+  replicas: 1
   selector:
     matchLabels:
       component: db
-  replicas: 1
   template:
     metadata:
-      name: db
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         component: db
-      annotations:
-        sidecar.istio.io/inject: "false"
+      name: db
     spec:
       containers:
-      - name: db-container
-        image: mysql:8.0.3
-        args:
+      - args:
         - --datadir
         - /var/lib/mysql/datadir
         envFrom:
@@ -28,21 +27,29 @@ spec:
             name: metadata-db-parameters
         - secretRef:
             name: metadata-db-secrets
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/mysql:8.0.3
+        name: db-container
         ports:
-        - name: dbapi
-          containerPort: 3306
+        - containerPort: 3306
+          name: dbapi
         readinessProbe:
           exec:
             command:
-            - "/bin/bash"
-            - "-c"
-            - "mysql -D $$MYSQL_DATABASE -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'"
+            - /bin/bash
+            - -c
+            - mysql -D $$MYSQL_DATABASE -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
           initialDelaySeconds: 5
           periodSeconds: 2
           timeoutSeconds: 1
+        resources:
+          limits:
+            memory: 600Mi
+          requests:
+            cpu: 300m
+            memory: 600Mi
         volumeMounts:
-        - name: metadata-mysql
-          mountPath: /var/lib/mysql
+        - mountPath: /var/lib/mysql
+          name: metadata-mysql
       volumes:
       - name: metadata-mysql
         persistentVolumeClaim:

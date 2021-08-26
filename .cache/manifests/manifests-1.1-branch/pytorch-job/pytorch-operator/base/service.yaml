@@ -1,10 +1,11 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
     prometheus.io/path: /metrics
-    prometheus.io/port: "8443"
-    prometheus.io/scrape: "true"
+    prometheus.io/port: '8443'
+    prometheus.io/scrape: 'true'
   labels:
     app: pytorch-operator
   name: pytorch-operator
@@ -16,4 +17,3 @@ spec:
   selector:
     name: pytorch-operator
   type: ClusterIP
-

@@ -1,11 +1,14 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
+commonLabels:
+  kustomize.component: cluster-local-gateway
 configMapGenerator:
-- name: cluster-local-gateway-parameters
-  envs:
+- envs:
   - params.env
-
+  name: cluster-local-gateway-parameters
+configurations:
+- params.yaml
+kind: Kustomization
 resources:
 - cluster-role-binding.yaml
 - cluster-role.yaml
@@ -15,18 +18,11 @@ resources:
 - pod-disruption-budget.yaml
 - service-account.yaml
 - service.yaml
-
 vars:
-- name: namespace
+- fieldref:
+    fieldpath: data.namespace
+  name: namespace
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: cluster-local-gateway-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.namespace
-
-commonLabels:
-  kustomize.component: cluster-local-gateway
-
-configurations:
-- params.yaml

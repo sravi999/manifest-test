@@ -1,4 +1,11 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  kustomize.component: mxnet-operator
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/mxnet-operator
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/mxnet-operator
+  newTag: v1.0.0-20200625
 kind: Kustomization
 namespace: kubeflow
 resources:
@@ -7,9 +14,3 @@ resources:
 - crd.yaml
 - deployment.yaml
 - service-account.yaml
-commonLabels:
-  kustomize.component: mxnet-operator
-images:
-- name: mxjob/mxnet-operator
-  newName: kubeflow/mxnet-operator
-  newTag: v1.0.0-20200625

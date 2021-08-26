@@ -1,29 +1,30 @@
-kind: Service
+---
 apiVersion: v1
+kind: Service
 metadata:
   labels:
     app: metadata
   name: service
 spec:
+  ports:
+  - name: backendapi
+    port: 8080
+    protocol: TCP
   selector:
     component: server
   type: ClusterIP
-  ports:
-  - port: 8080
-    protocol: TCP
-    name: backendapi
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   labels:
     app: grpc-metadata
   name: grpc-service
 spec:
+  ports:
+  - name: grpc-backendapi
+    port: 8080
+    protocol: TCP
   selector:
     component: grpc-server
   type: ClusterIP
-  ports:
-    - port: 8080
-      protocol: TCP
-      name: grpc-backendapi

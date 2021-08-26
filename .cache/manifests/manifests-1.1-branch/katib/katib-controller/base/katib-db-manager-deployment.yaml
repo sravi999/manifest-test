@@ -1,10 +1,11 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: katib-db-manager
   labels:
     app: katib
     component: db-manager
+  name: katib-db-manager
 spec:
   replicas: 1
   selector:
@@ -13,37 +14,47 @@ spec:
       component: db-manager
   template:
     metadata:
-      name: katib-db-manager
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         app: katib
         component: db-manager
-      annotations:
-        sidecar.istio.io/inject: "false"
+      name: katib-db-manager
     spec:
       containers:
-      - name: katib-db-manager
-        image: gcr.io/kubeflow-images-public/katib/v1alpha3/katib-db-manager
-        imagePullPolicy: IfNotPresent
+      - command:
+        - ./katib-db-manager
         env:
-          - name : DB_NAME
-            value: "mysql"
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: katib-mysql-secrets
-                key: MYSQL_ROOT_PASSWORD
-        command:
-          - './katib-db-manager'
-        ports:
-        - name: api
-          containerPort: 6789
-        readinessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:6789"]
-          initialDelaySeconds: 5
+        - name: DB_NAME
+          value: mysql
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MYSQL_ROOT_PASSWORD
+              name: katib-mysql-secrets
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/katib/v1alpha3/katib-db-manager:917164a
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
-            command: ["/bin/grpc_health_probe", "-addr=:6789"]
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:6789
+          failureThreshold: 5
           initialDelaySeconds: 10
           periodSeconds: 60
-          failureThreshold: 5
+        name: katib-db-manager
+        ports:
+        - containerPort: 6789
+          name: api
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:6789
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi

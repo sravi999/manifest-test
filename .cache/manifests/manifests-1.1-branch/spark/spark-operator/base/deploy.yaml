@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,9 +16,9 @@ spec:
     metadata:
       annotations:
         prometheus.io/path: /metrics
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
-        sidecar.istio.io/inject: "false"
+        prometheus.io/port: '10254'
+        prometheus.io/scrape: 'true'
+        sidecar.istio.io/inject: 'false'
       labels:
         app.kubernetes.io/name: sparkoperator
         app.kubernetes.io/version: v1beta2-1.1.0-2.4.5
@@ -36,9 +37,15 @@ spec:
         - -metrics-port=10254
         - -metrics-endpoint=/metrics
         - -metrics-prefix=
-        image: gcr.io/spark-operator/spark-operator:v1beta2-1.1.0-2.4.5
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/spark-operator/spark-operator:v1beta2-1.1.0-2.4.5
         imagePullPolicy: IfNotPresent
         name: sparkoperator
         ports:
         - containerPort: 10254
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: operator-sa

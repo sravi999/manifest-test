@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,10 +7,10 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         name: mxnet-operator
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - command:
@@ -23,7 +24,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: mxjob/mxnet-operator:v1beta1
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/mxnet-operator:v1.0.0-20200625
         imagePullPolicy: Always
         name: mxnet-operator
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: mxnet-operator

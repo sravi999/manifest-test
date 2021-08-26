@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,37 +8,45 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: 'false'
     spec:
       containers:
-      - name: profile-controller
-        image: python:3.7
-        command: ["python", "/hooks/sync.py"]
-        envFrom:
-        - configMapRef:
-            name: kubeflow-pipelines-profile-controller-env
+      - command:
+        - python
+        - /hooks/sync.py
         env:
         - name: KFP_VERSION
           valueFrom:
             configMapKeyRef:
-              name: pipeline-upstream-install-config
               key: appVersion
+              name: pipeline-upstream-install-config
         - name: MINIO_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: mlpipeline-minio-artifact
               key: accesskey
+              name: mlpipeline-minio-artifact
         - name: MINIO_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: mlpipeline-minio-artifact
               key: secretkey
-        volumeMounts:
-        - name: hooks
-          mountPath: /hooks
+              name: mlpipeline-minio-artifact
+        envFrom:
+        - configMapRef:
+            name: kubeflow-pipelines-profile-controller-env
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/python:3.7
+        name: profile-controller
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
+        volumeMounts:
+        - mountPath: /hooks
+          name: hooks
       volumes:
-      - name: hooks
-        configMap:
+      - configMap:
           name: kubeflow-pipelines-profile-controller-code
+        name: hooks

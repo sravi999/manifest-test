@@ -1,6 +1,20 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  kustomize.component: centraldashboard
+configMapGenerator:
+- envs:
+  - params.env
+  name: parameters
+configurations:
+- params.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+images: []
 kind: Kustomization
 namespace: kubeflow
+patchesStrategicMerge:
+- deployment_patch.yaml
 resources:
 - clusterrole-binding.yaml
 - clusterrole.yaml
@@ -9,21 +23,6 @@ resources:
 - role.yaml
 - service-account.yaml
 - service.yaml
-patchesStrategicMerge:
-- deployment_patch.yaml
-namespace: kubeflow
-commonLabels:
-  kustomize.component: centraldashboard
-images:
-- name: gcr.io/kubeflow-images-public/centraldashboard
-  newName: gcr.io/kubeflow-images-public/centraldashboard
-  newTag: v1.1.0-g35d7484a
-configMapGenerator:
-- envs:
-  - params.env
-  name: parameters
-generatorOptions:
-  disableNameSuffixHash: true
 vars:
 - fieldref:
     fieldPath: metadata.namespace
@@ -60,5 +59,3 @@ vars:
     apiVersion: v1
     kind: ConfigMap
     name: parameters
-configurations:
-- params.yaml

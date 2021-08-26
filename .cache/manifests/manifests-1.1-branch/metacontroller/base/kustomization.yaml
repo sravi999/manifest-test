@@ -1,4 +1,11 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  kustomize.component: metacontroller
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/metacontroller
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/metacontroller
+  newTag: v0.3.0
 kind: Kustomization
 namespace: kubeflow
 resources:
@@ -6,9 +13,3 @@ resources:
 - crd.yaml
 - service-account.yaml
 - stateful-set.yaml
-commonLabels:
-  kustomize.component: metacontroller
-images:
-- name: metacontroller/metacontroller
-  newName: metacontroller/metacontroller
-  newTag: v0.3.0

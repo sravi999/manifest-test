@@ -1,30 +1,29 @@
-# TODO(jlewi): This kustomization.yaml is deprecated. We want the
-# base_v3 version. This version uses a bunch of problematic patterns e.g.
-# i) Using vars to do command line substitution
-# ii) Not using a configmap to make application and global config available
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-- cluster-role-binding.yaml
-- crd.yaml
-- deployment.yaml
-- service.yaml
-- service-account.yaml
-namePrefix: profiles-
-namespace: kubeflow
 commonLabels:
   kustomize.component: profiles
 configMapGenerator:
 - envs:
   - params.env
   name: profiles-parameters
+configurations:
+- params.yaml
 images:
-- name: gcr.io/kubeflow-images-public/kfam
-  newName: gcr.io/kubeflow-images-public/kfam
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/profile-controller
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/profile-controller
+  newTag: vmaster-g34aa47c2
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/kfam
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/kfam
   newTag: v1.1.0-g9f3bfd00
-- name: gcr.io/kubeflow-images-public/profile-controller
-  newName: gcr.io/kubeflow-images-public/profile-controller
-  newTag: v1.1.0-ga49f658f
+kind: Kustomization
+namePrefix: profiles-
+namespace: kubeflow
+resources:
+- cluster-role-binding.yaml
+- crd.yaml
+- deployment.yaml
+- service.yaml
+- service-account.yaml
 vars:
 - fieldref:
     fieldPath: data.admin
@@ -61,5 +60,3 @@ vars:
     apiVersion: v1
     kind: Service
     name: kfam
-configurations:
-- params.yaml

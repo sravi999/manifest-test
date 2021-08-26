@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -8,14 +9,20 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: 'false'
     spec:
       containers:
       - command:
         - sh
         - /var/webhook-config/create_ca.sh
-        image: gcr.io/kubeflow-images-public/ingress-setup:latest
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/ingress-setup:latest
         name: bootstrap
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
         volumeMounts:
         - mountPath: /var/webhook-config/
           name: admission-webhook-config
@@ -25,5 +32,4 @@ spec:
       - configMap:
           name: config-map
         name: admission-webhook-config
-  # Workaround for https://github.com/kubernetes-sigs/kustomize/issues/677
   volumeClaimTemplates: []

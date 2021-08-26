@@ -1,4 +1,17 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  kustomize.component: mpi-operator
+configMapGenerator:
+- envs:
+  - params.env
+  name: mpi-operator-config
+generatorOptions:
+  disableNameSuffixHash: true
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/mpi-operator
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/mpi-operator
+  newTag: latest
 kind: Kustomization
 namespace: kubeflow
 resources:
@@ -7,30 +20,18 @@ resources:
 - crd.yaml
 - deployment.yaml
 - service-account.yaml
-commonLabels:
-  kustomize.component: mpi-operator
-images:
-- name: mpioperator/mpi-operator
-  newName: mpioperator/mpi-operator
-  newTag: latest
-configMapGenerator:
-- name: mpi-operator-config
-  envs:
-  - params.env
-generatorOptions:
-  disableNameSuffixHash: true
 vars:
-- name: kubectl-delivery-image
-  objref:
-    kind: ConfigMap
-    name: mpi-operator-config
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.kubectl-delivery-image
-- name: lock-namespace
+  name: kubectl-delivery-image
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: mpi-operator-config
-    apiVersion: v1
-  fieldref:
+- fieldref:
     fieldpath: data.lock-namespace
+  name: lock-namespace
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: mpi-operator-config

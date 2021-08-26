@@ -1,32 +1,44 @@
-# Each entry in this list results in the creation of
-# one ConfigMap resource (it's a generator of n maps).
+---
 configMapGenerator:
-- name: istio-install-parameters
-  envs:
+- envs:
   - params.env
-
-# Images modify the tags for images without
-# creating patches.
+  name: istio-install-parameters
+configurations:
+- params.yaml
 images:
-- name: docker.io/prom/prometheus
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/citadel
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/citadel
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/galley
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/galley
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/pilot
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/pilot
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/mixer
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/mixer
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/sidecar_injector
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/sidecar_injector
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/mixer
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/mixer
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/istio-release/proxyv2
+  newTag: release-1.3-latest-daily
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/prom/prometheus
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/prom/prometheus
   newTag: v2.8.0
-- name: gcr.io/istio-release/citadel
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/galley
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/kubectl
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/mixer
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/node-agent-k8s
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/pilot
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/proxyv2
-  newTag: release-1.3-latest-daily
-- name: gcr.io/istio-release/sidecar_injector
-  newTag: release-1.3-latest-daily
-
 resources:
 - namespace.yaml
 - attribute-manifest.yaml
@@ -48,15 +60,11 @@ resources:
 - service-account.yaml
 - service-role.yaml
 - service-role-binding.yaml
-
 vars:
-- name: namespace
+- fieldref:
+    fieldpath: data.namespace
+  name: namespace
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: istio-install-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.namespace
-
-configurations:
-- params.yaml

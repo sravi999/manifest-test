@@ -1,13 +1,14 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
 commonLabels:
   app: mysql
   app.kubernetes.io/component: mysql
   app.kubernetes.io/name: mysql
+images:
+- name: gcr.io/ml-pipeline/mysql
+  newName: gcr.io/ml-pipeline/mysql
+  newTag: '5.6'
+kind: Kustomization
 resources:
 - ../../../upstream/env/platform-agnostic/mysql
 - ../../overlays/application/application.yaml
-images:
-- name: gcr.io/ml-pipeline/mysql
-  newTag: '5.6'
-  newName: gcr.io/ml-pipeline/mysql

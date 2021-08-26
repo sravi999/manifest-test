@@ -1,4 +1,7 @@
+---
 apiVersion: v1
+imagePullSecrets:
+- name: artifactory-registry-secret
 kind: ServiceAccount
 metadata:
   name: ml-pipeline-ui

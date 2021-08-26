@@ -1,14 +1,15 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: metadata-db
   labels:
     component: db
+  name: metadata-db
 spec:
-  type: ClusterIP
   ports:
-    - port: 3306
-      protocol: TCP
-      name: dbapi
+  - name: dbapi
+    port: 3306
+    protocol: TCP
   selector:
     component: db
+  type: ClusterIP

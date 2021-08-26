@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,51 +8,63 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: 'false'
     spec:
       containers:
-      - command:
-        - /manager
-        args:
-        - "-userid-header"
+      - args:
+        - -userid-header
         - $(userid-header)
-        - "-userid-prefix"
+        - -userid-prefix
         - $(userid-prefix)
-        - "-workload-identity"
+        - -workload-identity
         - $(gcp-sa)
-        image: gcr.io/kubeflow-images-public/profile-controller:v20190619-v0-219-gbd3daa8c-dirty-1ced0e
+        command:
+        - /manager
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/profile-controller:vmaster-g34aa47c2
         imagePullPolicy: Always
-        name: manager
         livenessProbe:
           httpGet:
             path: /metrics
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 30
+        name: manager
         ports:
         - containerPort: 8080
           name: manager-http
           protocol: TCP
-      - command:
-        - /access-management
-        args:
-        - "-cluster-admin"
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
+      - args:
+        - -cluster-admin
         - $(admin)
-        - "-userid-header"
+        - -userid-header
         - $(userid-header)
-        - "-userid-prefix"
+        - -userid-prefix
         - $(userid-prefix)
-        image: gcr.io/kubeflow-images-public/kfam:v20190612-v0-170-ga06cdb79-dirty-a33ee4
+        command:
+        - /access-management
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubeflow-images-public/kfam:v1.1.0-g9f3bfd00
         imagePullPolicy: Always
-        name: kfam
         livenessProbe:
           httpGet:
             path: /metrics
             port: 8081
           initialDelaySeconds: 30
           periodSeconds: 30
+        name: kfam
         ports:
         - containerPort: 8081
           name: kfam-http
           protocol: TCP
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi
       serviceAccountName: controller-service-account

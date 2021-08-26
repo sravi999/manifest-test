@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: envoy-deployment
   labels:
     component: envoy
+  name: envoy-deployment
 spec:
   replicas: 1
   selector:
@@ -11,16 +12,22 @@ spec:
       component: envoy
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: 'false'
       labels:
         component: envoy
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - name: container
-        image: gcr.io/ml-pipeline/envoy:metadata-grpc
+      - image: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/envoy:metadata-grpc
+        name: container
         ports:
-        - name: md-envoy
-          containerPort: 9090
-        - name: envoy-admin
-          containerPort: 9901
+        - containerPort: 9090
+          name: md-envoy
+        - containerPort: 9901
+          name: envoy-admin
+        resources:
+          limits:
+            memory: 300Mi
+          requests:
+            cpu: 50m
+            memory: 300Mi

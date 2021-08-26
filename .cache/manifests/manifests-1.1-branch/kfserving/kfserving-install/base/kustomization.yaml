@@ -1,4 +1,22 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  kustomize.component: kfserving
+configMapGenerator:
+- envs:
+  - params.env
+  name: kfserving-config
+configurations:
+- params.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+images:
+- name: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubebuilder/kube-rbac-proxy
+  newName: docker.artifactory.ikarem.io/user/ravi/kubeflow/kubebuilder/kube-rbac-proxy
+  newTag: v0.4.0
+- name: $(registry)/kfserving-controller
+  newName: $(registry)/kfserving-controller
+  newTag: v0.3.0
 kind: Kustomization
 namespace: kubeflow
 resources:
@@ -10,28 +28,11 @@ resources:
 - statefulset.yaml
 - service.yaml
 - webhook.yaml
-commonLabels:
-  kustomize.component: kfserving
-generatorOptions:
- disableNameSuffixHash: true
-configMapGenerator:
-- envs:
-  - params.env
-  name: kfserving-config
 vars:
-- name: registry
+- fieldref:
+    fieldpath: data.registry
+  name: registry
   objref:
+    apiVersion: v1
     kind: ConfigMap
     name: kfserving-config
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.registry
-configurations:
-- params.yaml
-images:
-- name: gcr.io/kubebuilder/kube-rbac-proxy
-  newName: gcr.io/kubebuilder/kube-rbac-proxy
-  newTag: v0.4.0
-- name: $(registry)/kfserving-controller
-  newName: $(registry)/kfserving-controller
-  newTag: v0.3.0

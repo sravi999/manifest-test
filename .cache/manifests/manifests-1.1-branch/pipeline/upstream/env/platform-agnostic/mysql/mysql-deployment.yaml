@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
   labels:
     app: mysql
+  name: mysql
 spec:
   selector:
     matchLabels:
@@ -18,12 +19,18 @@ spec:
       containers:
       - env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
-          value: "true"
-        image: gcr.io/ml-pipeline/mysql:5.6
+          value: 'true'
+        image: docker.artifactory.ikarem.io/user/ravi/kubeflow/ml-pipeline/mysql:5.6
         name: mysql
         ports:
         - containerPort: 3306
           name: mysql
+        resources:
+          limits:
+            memory: 600Mi
+          requests:
+            cpu: 300m
+            memory: 600Mi
         volumeMounts:
         - mountPath: /var/lib/mysql
           name: mysql-persistent-storage

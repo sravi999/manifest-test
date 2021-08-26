@@ -8,6 +8,18 @@ data:
     {
     executorImage: $(executorImage),
     containerRuntimeExecutor: $(containerRuntimeExecutor),
+    executor:
+    {
+       resources: {
+            limits: {
+                memory: 50Mi
+                },
+            requests: {
+                cpu: 10m,
+                memory: 50Mi
+                }
+             }
+            },
     artifactRepository:
     {
         s3: {

@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 bases:
 - ../../base
@@ -7,4 +8,3 @@ commonLabels:
 kind: Kustomization
 resources:
 - application.yaml
-

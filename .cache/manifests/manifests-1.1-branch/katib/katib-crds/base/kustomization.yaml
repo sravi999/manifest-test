@@ -1,7 +1,9 @@
+---
+generatorOptions:
+  disableNameSuffixHash: true
+images: null
 namespace: kubeflow
 resources:
 - experiment-crd.yaml
 - suggestion-crd.yaml
 - trial-crd.yaml
-generatorOptions:
-  disableNameSuffixHash: true
